@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
+import bcrypt from "bcrypt";
 
 import { conflictError } from "../Middlewares/handleErrorsMiddleware.js";
 import * as cardRepository from "../repositories/cardRepository.js";
@@ -75,4 +76,15 @@ export async function createCardForEmployee(
   await cardRepository.insert(cardInfo);
 
   console.log(cvcNumber);
+}
+
+export async function updateActivationCard(cardId: number, password: string) {
+  const SALT: number = 10;
+  const hashPassword = bcrypt.hashSync(password, SALT);
+  const activationInfo: cardRepository.CardUpdateData = {
+    password: hashPassword,
+    isBlocked: false,
+  };
+
+  await cardRepository.update(cardId, activationInfo);
 }

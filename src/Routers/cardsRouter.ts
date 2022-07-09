@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { createCard } from "../Controllers/cardsController.js";
+import { activateCard, createCard } from "../Controllers/cardsController.js";
 import validApiKey from "../Middlewares/validApiKey.js";
 import validCard from "../Middlewares/validCard.js";
 import validEmployee from "../Middlewares/validEmployee.js";
@@ -21,7 +21,8 @@ cardsRouter.post(
 cardsRouter.post(
   "/cards/activate/:id",
   validSchema(activateCardSchema),
-  validCard
+  validCard,
+  activateCard
 );
 
 export default cardsRouter;

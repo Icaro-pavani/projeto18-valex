@@ -3,7 +3,10 @@ import { Card, TransactionTypes } from "../repositories/cardRepository.js";
 
 import { Company } from "../repositories/companyRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
-import { createCardForEmployee } from "../Services/cardServices.js";
+import {
+  createCardForEmployee,
+  updateActivationCard,
+} from "../Services/cardServices.js";
 
 export async function createCard(req: Request, res: Response) {
   const company: Company = res.locals.company;
@@ -17,6 +20,9 @@ export async function createCard(req: Request, res: Response) {
 
 export async function activateCard(req: Request, res: Response) {
   const card: Card = res.locals.card;
+  const password: string = res.locals.body.password;
 
-  res.sendStatus
+  await updateActivationCard(card.id, password);
+
+  res.sendStatus(200);
 }

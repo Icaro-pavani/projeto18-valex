@@ -17,7 +17,7 @@ export default async function validCard(
   next: NextFunction
 ) {
   const cryptr = new Cryptr(process.env.CRYPTRKEY);
-  const cvc: string = req.body.cvc;
+  const cvc: string = res.locals.body.cvc;
 
   const id: number = parseInt(req.params.id);
   if (!id) {
