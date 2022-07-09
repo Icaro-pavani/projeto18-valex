@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { findById } from "../repositories/employeeRepository.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
 
 import { unprocessableError } from "./handleErrorsMiddleware.js";
 
@@ -10,12 +10,12 @@ export default async function validEmployee(
 ) {
   const id: number = parseInt(req.params.id);
   if (!id) {
-    throw unprocessableError();
+    throw unprocessableError("The id must be a number!");
   }
 
-  const employee = await findById(id);
+  const employee = await employeeRepository.findById(id);
   if (!employee) {
-    throw unprocessableError();
+    throw unprocessableError("There ins't an employee with this id!");
   }
 
   res.locals.employee = employee;

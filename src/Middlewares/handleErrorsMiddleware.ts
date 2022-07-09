@@ -6,16 +6,16 @@ const serviceErrorToStatusCode = {
   unprocessable: 422,
 };
 
-export function conflictError() {
-  return { type: "conflict" };
+export function conflictError(message: string) {
+  return { type: "conflict", message: message || "" };
 }
 
-export function unprocessableError() {
-  return { type: "unprocessable" };
+export function unprocessableError(message: string) {
+  return { type: "unprocessable", message: message || "" };
 }
 
-export function unauthorizedError() {
-  return { type: "unauthoprized" };
+export function unauthorizedError(message: string) {
+  return { type: "unauthoprized", message: message || "" };
 }
 
 export default async function handleErrors(
@@ -25,7 +25,7 @@ export default async function handleErrors(
   next: NextFunction
 ) {
   if (error) {
-    return res.sendStatus(serviceErrorToStatusCode[error.type]);
+    return res.status(serviceErrorToStatusCode[error.type]).send(error.message);
   }
 
   return res.sendStatus(500);

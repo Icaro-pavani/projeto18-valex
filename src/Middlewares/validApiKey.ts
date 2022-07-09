@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { findByApiKey } from "../repositories/companyRepository.js";
+import * as companyRepository from "../repositories/companyRepository.js";
 
 import apiKeySchema from "../Schema/apiKeySchema.js";
 
@@ -17,7 +17,7 @@ export default async function validApiKey(
 
     const apiKeyValidation: string = await apiKeySchema.validateAsync(apiKey);
 
-    const company = await findByApiKey(apiKeyValidation);
+    const company = await companyRepository.findByApiKey(apiKeyValidation);
 
     if (!company) {
       return res.sendStatus(401);
