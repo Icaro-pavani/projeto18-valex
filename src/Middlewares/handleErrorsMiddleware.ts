@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 const serviceErrorToStatusCode = {
-  Unauthorized: 401,
+  unauthorized: 401,
   conflict: 409,
   unprocessable: 422,
 };
@@ -15,7 +15,7 @@ export function unprocessableError(message: string) {
 }
 
 export function unauthorizedError(message: string) {
-  return { type: "unauthoprized", message: message || "" };
+  return { type: "unauthorized", message: message || "" };
 }
 
 export default async function handleErrors(

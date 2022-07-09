@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TransactionTypes } from "../repositories/cardRepository.js";
+import { Card, TransactionTypes } from "../repositories/cardRepository.js";
 
 import { Company } from "../repositories/companyRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
@@ -12,5 +12,11 @@ export async function createCard(req: Request, res: Response) {
   const type: TransactionTypes = body.type;
 
   await createCardForEmployee(company, employee, type);
-  res.sendStatus(200);
+  res.sendStatus(201);
+}
+
+export async function activateCard(req: Request, res: Response) {
+  const card: Card = res.locals.card;
+
+  res.sendStatus
 }
