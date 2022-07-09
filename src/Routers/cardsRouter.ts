@@ -4,6 +4,7 @@ import {
   activateCard,
   blockCard,
   createCard,
+  unblockCard,
 } from "../Controllers/cardsController.js";
 import validApiKey from "../Middlewares/validApiKey.js";
 import validCard from "../Middlewares/validCard.js";
@@ -35,6 +36,13 @@ cardsRouter.post(
   validSchema(passwordSchema),
   validCard,
   blockCard
+);
+
+cardsRouter.post(
+  "/cards/unblock/:id",
+  validSchema(passwordSchema),
+  validCard,
+  unblockCard
 );
 
 export default cardsRouter;

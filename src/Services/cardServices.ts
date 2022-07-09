@@ -104,12 +104,19 @@ export async function updateActivationCard(
   await cardRepository.update(card.id, activationInfo);
 }
 
-export async function blockActivatedCard(
+export async function blockUnblockCard(
   card: cardRepository.Card,
-  password: string
+  password: string,
+  block: boolean
 ) {
-  if (!!card.isBlocked) {
-    throw unauthorizedError("Card is blocked already!");
+  if (!!block) {
+    if (!!card.isBlocked) {
+      throw unauthorizedError("Card is blocked already!");
+    }
+  } else {
+    if (!card.isBlocked) {
+      throw unauthorizedError("Card is currently unblocked");
+    }
   }
 
   if (!bcrypt.compareSync(password, card.password)) {
@@ -117,7 +124,7 @@ export async function blockActivatedCard(
   }
 
   const blockCardData: cardRepository.CardUpdateData = {
-    isBlocked: true,
+    isBlocked: block,
   };
 
   await cardRepository.update(card.id, blockCardData);

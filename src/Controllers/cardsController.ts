@@ -4,7 +4,7 @@ import { Card, TransactionTypes } from "../repositories/cardRepository.js";
 import { Company } from "../repositories/companyRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
 import {
-  blockActivatedCard,
+  blockUnblockCard,
   createCardForEmployee,
   updateActivationCard,
 } from "../Services/cardServices.js";
@@ -31,8 +31,19 @@ export async function activateCard(req: Request, res: Response) {
 export async function blockCard(req: Request, res: Response) {
   const card: Card = res.locals.card;
   const { password }: { password: string } = res.locals.body;
+  const isToBlock = true;
 
-  await blockActivatedCard(card, password);
+  await blockUnblockCard(card, password, isToBlock);
+
+  res.sendStatus(200);
+}
+
+export async function unblockCard(req: Request, res: Response) {
+  const card: Card = res.locals.card;
+  const { password }: { password: string } = res.locals.body;
+  const isToBlock = false;
+
+  await blockUnblockCard(card, password, isToBlock);
 
   res.sendStatus(200);
 }
