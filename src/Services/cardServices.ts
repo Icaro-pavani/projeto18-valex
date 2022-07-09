@@ -3,7 +3,10 @@ import dayjs from "dayjs";
 import Cryptr from "cryptr";
 import bcrypt from "bcrypt";
 
-import { conflictError } from "../Middlewares/handleErrorsMiddleware.js";
+import {
+  conflictError,
+  unauthorizedError,
+} from "../Middlewares/handleErrorsMiddleware.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import { Company } from "../repositories/companyRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
@@ -78,7 +81,19 @@ export async function createCardForEmployee(
   console.log(cvcNumber);
 }
 
-export async function updateActivationCard(cardId: number, password: string) {
+export async function updateActivationCard(
+  card: cardRepository.Card,
+  password: string,
+  cvc: string
+) {
+  const cryptr = new Cryptr(process.env.CRYPTRKEY);
+  if (cvc !== cryptr.decrypt(card.securityCode)) {
+    throw unauthorizedError("CVC doesn't match!");
+  }
+  if (card.password) {
+    throw unauthorizedError("Card already activated");
+  }
+
   const SALT: number = 10;
   const hashPassword = bcrypt.hashSync(password, SALT);
   const activationInfo: cardRepository.CardUpdateData = {
@@ -86,5 +101,24 @@ export async function updateActivationCard(cardId: number, password: string) {
     isBlocked: false,
   };
 
-  await cardRepository.update(cardId, activationInfo);
+  await cardRepository.update(card.id, activationInfo);
+}
+
+export async function blockActivatedCard(
+  card: cardRepository.Card,
+  password: string
+) {
+  if (!!card.isBlocked) {
+    throw unauthorizedError("Card is blocked already!");
+  }
+
+  if (!bcrypt.compareSync(password, card.password)) {
+    throw unauthorizedError("Wrong password!");
+  }
+
+  const blockCardData: cardRepository.CardUpdateData = {
+    isBlocked: true,
+  };
+
+  await cardRepository.update(card.id, blockCardData);
 }

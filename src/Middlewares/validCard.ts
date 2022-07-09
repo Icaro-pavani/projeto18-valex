@@ -26,19 +26,11 @@ export default async function validCard(
 
   const card = await cardRepository.findById(id);
   if (!card) {
-    throw unprocessableError("There ins't a card with this id!");
+    throw unprocessableError("There isn't a card with this id!");
   }
 
   if (dayjs(card.expirationDate, "MM/YY") < dayjs()) {
     throw unauthorizedError("Card expired!");
-  }
-
-  if (card.password) {
-    throw unauthorizedError("Card already activated");
-  }
-
-  if (cvc !== cryptr.decrypt(card.securityCode)) {
-    throw unauthorizedError("CVC doesn't match!");
   }
 
   res.locals.card = card;
