@@ -66,7 +66,7 @@ export async function createCardForEmployee(
     password: null,
     isVirtual: false,
     originalCardId: null,
-    isBlocked: true,
+    isBlocked: false,
     type,
   };
 
@@ -111,6 +111,10 @@ export async function blockUnblockCard(
     if (!card.isBlocked) {
       throw unauthorizedError("Card is currently unblocked");
     }
+  }
+
+  if (!card.password) {
+    throw unauthorizedError("Card must be active to be blocked!");
   }
 
   if (!bcrypt.compareSync(password, card.password)) {

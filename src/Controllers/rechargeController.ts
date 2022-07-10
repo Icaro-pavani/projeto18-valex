@@ -13,8 +13,8 @@ export async function rechargeCard(req: Request, res: Response) {
 
   const employee = await employeeIdValidation(card.employeeId, company.id);
 
-  if (card.isBlocked) {
-    throw unauthorizedError("This card is blocked!");
+  if (!card.password) {
+    throw unauthorizedError("This card is not active!");
   }
 
   await rechargeAmountToCard(card.id, amount);
