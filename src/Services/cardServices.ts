@@ -9,6 +9,8 @@ import {
 } from "../Middlewares/handleErrorsMiddleware.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
+import * as paymentRepository from "../repositories/paymentRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
 async function generateCardNumber() {
   const number = faker.finance.creditCardNumber("#### #### #### ####");
@@ -126,4 +128,33 @@ export async function blockUnblockCard(
   };
 
   await cardRepository.update(card.id, blockCardData);
+}
+
+export async function transactionsBalanceByCardId(cardId: number) {
+  const transactionsResult = await paymentRepository.findByCardId(cardId);
+  const rechargesResult = await rechargeRepository.findByCardId(cardId);
+
+  let balance = 0;
+  const transactions = transactionsResult.map((transaction) => {
+    balance -= transaction.amount;
+    return {
+      ...transaction,
+      timestamp: dayjs(transaction.timestamp).format("DD/MM/YYYY"),
+    };
+  });
+  const recharges = rechargesResult.map((recharge) => {
+    balance += recharge.amount;
+    return {
+      ...recharge,
+      timestamp: dayjs(recharge.timestamp).format("DD/MM/YYYY"),
+    };
+  });
+
+  const transactionsBalance = {
+    balance,
+    transactions,
+    recharges,
+  };
+
+  return transactionsBalance;
 }

@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
+import { unprocessableError } from "../Middlewares/handleErrorsMiddleware.js";
 import { Card, TransactionTypes } from "../repositories/cardRepository.js";
 
 import { Employee } from "../repositories/employeeRepository.js";
 import {
   blockUnblockCard,
   createCardForEmployee,
+  transactionsBalanceByCardId,
   updateActivationCard,
 } from "../Services/cardServices.js";
 
@@ -44,4 +46,16 @@ export async function unblockCard(req: Request, res: Response) {
   await blockUnblockCard(card, password, isToBlock);
 
   res.sendStatus(200);
+}
+
+export async function getCardTransations(req: Request, res: Response) {
+  const cardId: number = parseInt(req.params.id);
+
+  if (!cardId) {
+    throw unprocessableError("Card id must be a number!");
+  }
+
+  const transationsBalance = await transactionsBalanceByCardId(cardId);
+
+  res.status(200).send(transationsBalance);
 }

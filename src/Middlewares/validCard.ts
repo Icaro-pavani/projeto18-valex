@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
-import Cryptr from "cryptr";
 
 dayjs.extend(customParseFormat);
 
