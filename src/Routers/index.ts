@@ -1,13 +1,13 @@
 import { Router } from "express";
 
 import cardsRouter from "./cardsRouter.js";
-import posRouter from "./posRouter.js";
+import paymentRouter from "./paymentRouter.js";
 import rechargeRouter from "./rechargeRouter.js";
 
 const router = Router();
 
 router.use(cardsRouter);
 router.use(rechargeRouter);
-router.use(posRouter);
+router.use(paymentRouter);
 
 export default router;
