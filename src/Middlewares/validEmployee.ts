@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import { Company } from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
+import { employeeIdValidation } from "../Services/employeeServices.js";
 
-import { unprocessableError } from "./handleErrorsMiddleware.js";
+import {
+  unauthorizedError,
+  unprocessableError,
+} from "./handleErrorsMiddleware.js";
 
 export default async function validEmployee(
   req: Request,
@@ -9,14 +14,9 @@ export default async function validEmployee(
   next: NextFunction
 ) {
   const id: number = parseInt(req.params.id);
-  if (!id) {
-    throw unprocessableError("The id must be a number!");
-  }
+  const company: Company = res.locals.company;
 
-  const employee = await employeeRepository.findById(id);
-  if (!employee) {
-    throw unprocessableError("There ins't an employee with this id!");
-  }
+  const employee = await employeeIdValidation(id, company.id);
 
   res.locals.employee = employee;
 

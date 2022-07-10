@@ -16,9 +16,6 @@ export default async function validCard(
   res: Response,
   next: NextFunction
 ) {
-  const cryptr = new Cryptr(process.env.CRYPTRKEY);
-  const cvc: string = res.locals.body.cvc;
-
   const id: number = parseInt(req.params.id);
   if (!id) {
     throw unprocessableError("The id must be a number!");

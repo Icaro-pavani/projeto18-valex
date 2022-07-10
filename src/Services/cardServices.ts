@@ -8,7 +8,6 @@ import {
   unauthorizedError,
 } from "../Middlewares/handleErrorsMiddleware.js";
 import * as cardRepository from "../repositories/cardRepository.js";
-import { Company } from "../repositories/companyRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
 
 async function generateCardNumber() {
@@ -38,16 +37,11 @@ function formatName(name: string) {
 }
 
 export async function createCardForEmployee(
-  company: Company,
   employee: Employee,
   type: cardRepository.TransactionTypes
 ) {
   const yearsToExpirate = 5;
   const cryptr = new Cryptr(process.env.CRYPTRKEY);
-
-  if (employee.companyId !== company.id) {
-    throw conflictError("This employee doesn't works for this company!");
-  }
 
   const cardCreated = await cardRepository.findByTypeAndEmployeeId(
     type,
@@ -78,7 +72,7 @@ export async function createCardForEmployee(
 
   await cardRepository.insert(cardInfo);
 
-  console.log(cvcNumber);
+  console.log(cvcNumber); //to know the value of the CVC of the card for other routes
 }
 
 export async function updateActivationCard(
