@@ -4,6 +4,8 @@ import {
   activateCard,
   blockCard,
   createCard,
+  createVirtualCard,
+  deleteVirtualCard,
   getCardTransations,
   unblockCard,
 } from "../Controllers/cardsController.js";
@@ -47,5 +49,19 @@ cardsRouter.post(
 );
 
 cardsRouter.get("/cards/transactions/:id", getCardTransations);
+
+cardsRouter.post(
+  "/cards/virtual/create/:id",
+  validSchema(passwordSchema),
+  validCard,
+  createVirtualCard
+);
+
+cardsRouter.delete(
+  "/cards/delete-virtual/:id",
+  validSchema(passwordSchema),
+  validCard,
+  deleteVirtualCard
+);
 
 export default cardsRouter;

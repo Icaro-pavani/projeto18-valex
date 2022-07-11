@@ -1,7 +1,9 @@
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
-import Cryptr from "cryptr";
 import bcrypt from "bcrypt";
+import Cryptr from "cryptr";
+
+const cryptr = new Cryptr(process.env.CRYPTRKEY);
 
 import {
   conflictError,
@@ -12,13 +14,18 @@ import { Employee } from "../repositories/employeeRepository.js";
 import * as paymentRepository from "../repositories/paymentRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
-async function generateCardNumber() {
-  const number = faker.finance.creditCardNumber("#### #### #### ####");
+async function generateCardNumber(isVirtual: boolean) {
+  let number = "";
+  if (isVirtual) {
+    number = faker.finance.creditCardNumber("mastercard").replace(/-/g, " ");
+  } else {
+    number = faker.finance.creditCardNumber("#### #### #### ####");
+  }
   const cardWithNumber = await cardRepository.findByCardNumber(number);
   if (!cardWithNumber) {
     return number;
   }
-  generateCardNumber();
+  generateCardNumber(isVirtual);
 }
 
 function formatName(name: string) {
@@ -38,12 +45,42 @@ function formatName(name: string) {
   return formatedName.join(" ");
 }
 
+async function createCardInfo(
+  employeeId: number,
+  employeeFullname: string,
+  type: cardRepository.TransactionTypes,
+  isVirtual: boolean,
+  originalCardId: number | null = null
+) {
+  const yearsToExpirate = 5;
+
+  const number = await generateCardNumber(isVirtual);
+  const cvcNumber = faker.finance.creditCardCVV();
+  const securityCode = cryptr.encrypt(cvcNumber);
+  const cardholderName = formatName(employeeFullname);
+  const expirationDate = dayjs().add(yearsToExpirate, "year").format("MM/YY");
+
+  const cardInfo: cardRepository.CardInsertData = {
+    employeeId,
+    number,
+    cardholderName,
+    securityCode,
+    expirationDate,
+    password: null,
+    isVirtual,
+    originalCardId,
+    isBlocked: false,
+    type,
+  };
+
+  return cardInfo;
+}
+
 export async function createCardForEmployee(
   employee: Employee,
   type: cardRepository.TransactionTypes
 ) {
-  const yearsToExpirate = 5;
-  const cryptr = new Cryptr(process.env.CRYPTRKEY);
+  const isVirtual = false;
 
   const cardCreated = await cardRepository.findByTypeAndEmployeeId(
     type,
@@ -53,28 +90,21 @@ export async function createCardForEmployee(
     throw conflictError("The employee already has this type of card");
   }
 
-  const cardNumber = await generateCardNumber();
-  const cvcNumber = faker.finance.creditCardCVV();
-  const cryptedCvcNumber = cryptr.encrypt(cvcNumber);
-  const cardName = formatName(employee.fullName);
-  const expirationDate = dayjs().add(yearsToExpirate, "year").format("MM/YY");
-
-  const cardInfo: cardRepository.CardInsertData = {
-    employeeId: employee.id,
-    number: cardNumber,
-    cardholderName: cardName,
-    securityCode: cryptedCvcNumber,
-    expirationDate,
-    password: null,
-    isVirtual: false,
-    originalCardId: null,
-    isBlocked: false,
+  const cardInfo = await createCardInfo(
+    employee.id,
+    employee.fullName,
     type,
-  };
+    isVirtual
+  );
 
   await cardRepository.insert(cardInfo);
 
-  console.log(cvcNumber); //to know the value of the CVC of the card for other routes
+  return {
+    number: cardInfo.number,
+    cardholderName: cardInfo.cardholderName,
+    cvc: cryptr.decrypt(cardInfo.securityCode),
+    type,
+  };
 }
 
 export async function updateActivationCard(
@@ -82,7 +112,6 @@ export async function updateActivationCard(
   password: string,
   cvc: string
 ) {
-  const cryptr = new Cryptr(process.env.CRYPTRKEY);
   if (cvc !== cryptr.decrypt(card.securityCode)) {
     throw unauthorizedError("CVC doesn't match!");
   }
@@ -157,4 +186,49 @@ export async function transactionsBalanceByCardId(cardId: number) {
   };
 
   return transactionsBalance;
+}
+
+export async function createVirtualCardEmployee(
+  card: cardRepository.Card,
+  password: string
+) {
+  const isVirtual = true;
+
+  if (!bcrypt.compareSync(password, card.password)) {
+    throw unauthorizedError("Wrong password!");
+  }
+
+  const cardInfo = await createCardInfo(
+    card.employeeId,
+    card.cardholderName,
+    card.type,
+    isVirtual,
+    card.id
+  );
+  cardInfo.cardholderName = card.cardholderName;
+  cardInfo.password = card.password;
+
+  await cardRepository.insert(cardInfo);
+
+  return {
+    number: cardInfo.number,
+    cardholderName: cardInfo.cardholderName,
+    cvc: cryptr.decrypt(cardInfo.securityCode),
+    type: card.type,
+  };
+}
+
+export async function deleteVirtualCardByPassword(
+  card: cardRepository.Card,
+  password: string
+) {
+  if (!bcrypt.compareSync(password, card.password)) {
+    throw unauthorizedError("Wrong password!");
+  }
+
+  if (!card.isVirtual) {
+    throw unauthorizedError("It is not a virtual card!");
+  }
+
+  await cardRepository.remove(card.id);
 }
