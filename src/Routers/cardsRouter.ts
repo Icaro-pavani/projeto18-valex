@@ -6,6 +6,7 @@ import {
   createCard,
   createVirtualCard,
   deleteVirtualCard,
+  getCardsInfo,
   getCardTransations,
   unblockCard,
 } from "../Controllers/cardsController.js";
@@ -14,6 +15,7 @@ import validCard from "../Middlewares/validCard.js";
 import validEmployee from "../Middlewares/validEmployee.js";
 import validSchema from "../Middlewares/validSchema.js";
 import activateCardSchema from "../Schema/activateCardSchema.js";
+import cardInfoSchema from "../Schema/cardInfoSchema.js";
 import passwordSchema from "../Schema/passwordSchema.js";
 import typeSchema from "../Schema/typeSchema.js";
 
@@ -62,6 +64,13 @@ cardsRouter.delete(
   validSchema(passwordSchema),
   validCard,
   deleteVirtualCard
+);
+
+cardsRouter.post(
+  "/cards/cardInfo/:id",
+  validSchema(cardInfoSchema),
+  validCard,
+  getCardsInfo
 );
 
 export default cardsRouter;

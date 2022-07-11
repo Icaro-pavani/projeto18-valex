@@ -8,6 +8,7 @@ const cryptr = new Cryptr(process.env.CRYPTRKEY);
 import {
   conflictError,
   unauthorizedError,
+  unprocessableError,
 } from "../Middlewares/handleErrorsMiddleware.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
@@ -232,4 +233,28 @@ export async function deleteVirtualCardByPassword(
   }
 
   await cardRepository.remove(card.id);
+}
+
+export function getCardInfoByIdAndPassword(
+  card: cardRepository.Card,
+  cardPassword: string,
+  employeeId: number
+) {
+  if (!employeeId) {
+    throw unprocessableError("employeeId must be a number!");
+  }
+  if (!bcrypt.compareSync(cardPassword, card.password)) {
+    return [];
+  }
+
+  const cardArray = [
+    {
+      number: card.number,
+      cardholderName: card.cardholderName,
+      expirationDate: card.expirationDate,
+      securityCode: cryptr.decrypt(card.securityCode),
+    },
+  ];
+
+  return cardArray;
 }

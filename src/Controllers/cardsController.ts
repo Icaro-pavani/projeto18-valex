@@ -11,6 +11,7 @@ import {
   createCardForEmployee,
   createVirtualCardEmployee,
   deleteVirtualCardByPassword,
+  getCardInfoByIdAndPassword,
   transactionsBalanceByCardId,
   updateActivationCard,
 } from "../Services/cardServices.js";
@@ -85,4 +86,16 @@ export async function deleteVirtualCard(req: Request, res: Response) {
   await deleteVirtualCardByPassword(card, password);
 
   res.sendStatus(200);
+}
+
+export async function getCardsInfo(req: Request, res: Response) {
+  const card: Card = res.locals.card;
+  const {
+    employeeId,
+    cardPassword,
+  }: { employeeId: number; cardPassword: string } = res.locals.body;
+
+  const cards = getCardInfoByIdAndPassword(card, cardPassword, employeeId);
+
+  res.status(200).send({ cards });
 }
