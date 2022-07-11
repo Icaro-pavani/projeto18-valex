@@ -1,6 +1,8 @@
-import { faker } from "@faker-js/faker";
 import { Request, Response } from "express";
-import { unprocessableError } from "../Middlewares/handleErrorsMiddleware.js";
+import {
+  unauthorizedError,
+  unprocessableError,
+} from "../Middlewares/handleErrorsMiddleware.js";
 import { Card, TransactionTypes } from "../repositories/cardRepository.js";
 
 import { Employee } from "../repositories/employeeRepository.js";
@@ -25,6 +27,10 @@ export async function createCard(req: Request, res: Response) {
 export async function activateCard(req: Request, res: Response) {
   const card: Card = res.locals.card;
   const { cvc, password }: { cvc: string; password: string } = res.locals.body;
+
+  if (card.isVirtual) {
+    throw unauthorizedError("It is a virtual card, it's already active!");
+  }
 
   await updateActivationCard(card, password, cvc);
 
