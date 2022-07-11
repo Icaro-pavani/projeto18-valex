@@ -13,6 +13,10 @@ export async function rechargeCard(req: Request, res: Response) {
 
   const employee = await employeeIdValidation(card.employeeId, company.id);
 
+  if (card.isVirtual) {
+    throw unauthorizedError("It is a virtual card!");
+  }
+
   if (!card.password) {
     throw unauthorizedError("This card is not active!");
   }
