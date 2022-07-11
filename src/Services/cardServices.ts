@@ -243,6 +243,11 @@ export function getCardInfoByIdAndPassword(
   if (!employeeId) {
     throw unprocessableError("employeeId must be a number!");
   }
+
+  if (!card.password) {
+    throw unauthorizedError("Card not active!");
+  }
+
   if (!bcrypt.compareSync(cardPassword, card.password)) {
     return [];
   }
