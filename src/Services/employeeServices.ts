@@ -18,7 +18,7 @@ export async function employeeIdValidation(
   }
 
   if (employee.companyId !== companyId) {
-    throw unauthorizedError("This employee doesn't work ion your company!");
+    throw unauthorizedError("This employee doesn't work in your company!");
   }
 
   return employee;
