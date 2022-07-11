@@ -214,6 +214,7 @@ export async function createVirtualCardEmployee(
     number: cardInfo.number,
     cardholderName: cardInfo.cardholderName,
     cvc: cryptr.decrypt(cardInfo.securityCode),
+    expirationDate: cardInfo.expirationDate,
     type: card.type,
   };
 }

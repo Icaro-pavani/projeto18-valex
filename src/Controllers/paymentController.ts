@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { unprocessableError } from "../Middlewares/handleErrorsMiddleware.js";
+import {
+  unauthorizedError,
+  unprocessableError,
+} from "../Middlewares/handleErrorsMiddleware.js";
 import { Card } from "../repositories/cardRepository.js";
 import {
   businessPayment,
@@ -14,6 +17,10 @@ export async function paymentInPOS(req: Request, res: Response) {
     cardPassword,
   }: { businessId: number; amount: number; cardPassword: string } =
     res.locals.body;
+
+  if (card.isVirtual) {
+    throw unauthorizedError("It is an virtual card!");
+  }
 
   await businessPayment(businessId, amount, cardPassword, card);
 

@@ -35,7 +35,7 @@ async function persistPayment(
   }
 
   const paymentInfo: paymentRepository.PaymentInsertData = {
-    cardId: cardId,
+    cardId,
     businessId,
     amount,
   };
@@ -94,5 +94,9 @@ export async function onlineBusinessPayment(
 
   await validateBusiness(businessId, card.type);
 
-  await persistPayment(card.id, businessId, amount);
+  if (card.isVirtual) {
+    await persistPayment(card.originalCardId, businessId, amount);
+  } else {
+    await persistPayment(card.id, businessId, amount);
+  }
 }
