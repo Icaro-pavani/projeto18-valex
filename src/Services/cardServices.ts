@@ -195,6 +195,10 @@ export async function createVirtualCardEmployee(
 ) {
   const isVirtual = true;
 
+  if (card.isVirtual) {
+    throw conflictError("Creating from a virtual card!");
+  }
+
   if (!bcrypt.compareSync(password, card.password)) {
     throw unauthorizedError("Wrong password!");
   }
