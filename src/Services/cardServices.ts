@@ -244,6 +244,10 @@ export function getCardInfoByIdAndPassword(
     throw unprocessableError("employeeId must be a number!");
   }
 
+  if (employeeId !== card.employeeId) {
+    throw unauthorizedError("This card doesn't belong to this employee!");
+  }
+
   if (!card.password) {
     throw unauthorizedError("Card not active!");
   }

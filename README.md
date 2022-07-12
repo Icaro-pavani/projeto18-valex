@@ -1,45 +1,63 @@
 # Valex
 
 <p align="center">
-  <a href="https://github.com/$username-github/$nome-repositorio">
-    <img src="./readme.png" alt="readme-logo" width="80" height="80">
+  <a href="https://github.com/Icaro-pavani/projeto18-valex">
+    
   </a>
 
   <h3 align="center">
-    $nome-repositorio
+    projeto18-valex
   </h3>
 </p>
 
 ## Usage
 
 ```bash
-$ git clone https://github.com/$username-github/$nome-repositorio
+$ git clone https://github.com/Icaro-pavani/projeto18-valex
 
-$ cd $nome-repositorio
+$ cd projeto18-valex
 
 $ npm install
 
 $ npm run dev
 ```
 
-API:
+### API:
 
 ```
-- POST /cadastro
-    - Rota para cadastrar um novo usuário
-    - headers: {}
-    - body: {
-        "nome": "Lorem ipsum",
-        "email": "lorem@gmail.com",
-        "senha": "loremipsum"
+- POST /cards/create/:id
+    - Create new card route
+    - id is the employee id
+    - headers: {
+        x-api-key: add api key of the company
     }
-- POST /login
-    - Rota para fazer login
-    - headers: {}
     - body: {
-    "email": "lorem@gmail.com",
-    "senha": "loremipsum"
+        "type": "groceries" or "restaurant" or "transport" or "education" or "health";
     }
+    - Return: {
+        "number",
+        "cardholderName",
+        "cvc",
+        "type"
+    }
+    - The cvc are the security code of the card, which is used for others routes
+
+- POST /cards/activate/:id
+    - Activate card route
+    - id is the card id
+    - body: {
+        "cvc": "567",
+        "password": "3367"
+    }
+
+- POST /cards/cardInfo/:id
+    - See card informations route
+    - id is the card id
+    - body: {
+        "employeeId": 1,
+        "cardPassword": "3367"
+    }
+
 - GET /usuarios (autenticada)
     - Rota para listar todos os usuários
     - headers: { "Authorization": "Bearer $token" }
