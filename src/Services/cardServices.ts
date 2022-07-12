@@ -232,12 +232,12 @@ export async function deleteVirtualCardByPassword(
   card: cardRepository.Card,
   password: string
 ) {
-  if (!bcrypt.compareSync(password, card.password)) {
-    throw unauthorizedError("Wrong password!");
-  }
-
   if (!card.isVirtual) {
     throw unauthorizedError("It is not a virtual card!");
+  }
+
+  if (!bcrypt.compareSync(password, card.password)) {
+    throw unauthorizedError("Wrong password!");
   }
 
   await cardRepository.remove(card.id);
