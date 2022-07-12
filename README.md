@@ -124,16 +124,23 @@ $ npm run dev
     }
     - Use integers for amount, so the last two house of the number represent the cents
 
-- PUT /usuarios/:id (autenticada)
-    - Rota para atualizar um usuário pelo id
-    - headers: { "Authorization": "Bearer $token" }
+- POST /cards/virtual/create/:id
+    - Create virtual card route
+    - id is the card id
+    - headers: {}
     - body: {
-        "nome": "Lorem ipsum2",
-        "email": "lorem2@gmail.com",
-        "senha": "loremipsum2"
+        "password": "3367"
     }
-- DELETE /usuarios/:id (autenticada)
-    - Rota para deletar um usuário pelo id
-    - headers: { "Authorization": "Bearer $token" }
-    - body: {}
+
+- DELETE /cards/delete-virtual/:id
+    - Delete virtual card route
+    - id is the card id
+    - headers: {}
+    - body: {
+        "password": "3367"
+    }
 ```
+
+## Deploy
+
+The API is deployed at the link: [https://ipt-valex.herokuapp.com/](https://ipt-valex.herokuapp.com/)
