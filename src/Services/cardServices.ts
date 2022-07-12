@@ -199,6 +199,10 @@ export async function createVirtualCardEmployee(
     throw conflictError("Creating from a virtual card!");
   }
 
+  if (!card.password) {
+    throw unauthorizedError("The card is not active!");
+  }
+
   if (!bcrypt.compareSync(password, card.password)) {
     throw unauthorizedError("Wrong password!");
   }
